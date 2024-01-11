@@ -45,7 +45,7 @@ int parsing(char *buffer, int num_track)
 {
     if (buffer == NULL)
         error(4);
-    return num_track;
+   
 
     char *token = strtok(buffer, "\n $");
     if (token == NULL)
@@ -53,10 +53,10 @@ int parsing(char *buffer, int num_track)
         return num_track;
     }
 
-    char *code = token;
     char *value = strtok(NULL, "\n ");
 
-    finding(code, value, num_track);
+    finding(token, value, num_track);
+     return num_track;
 }
 /**
  * find - finds a file
