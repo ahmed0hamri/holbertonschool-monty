@@ -11,9 +11,8 @@ void oppening(char *file_name)
     FILE *fd = fopen(file_name, "r");
 
     if (file_name == NULL || fd == NULL)
-        err(2, file_name);
-
-    read(fd);
+        error(2, file_name);
+    readit(fd);
 
     fclose(fd);
 }
@@ -24,7 +23,7 @@ void oppening(char *file_name)
  * Return: void
  */
 
-void read(FILE *fd)
+void readit(FILE *fd)
 {
     int num_track = 1;
     char *buffer = NULL;
@@ -32,7 +31,7 @@ void read(FILE *fd)
 
     while (getline(&buffer, &len, fd) != -1)
     {
-        parse(buffer, num_track);
+        parsing(buffer, num_track);
         num_track++;
     }
 
@@ -42,65 +41,79 @@ void read(FILE *fd)
  * parsing - parse the code
  * Return: void
  */
-void parsing(char *buffer, int num_track, int pos)
+int parsing(char *buffer, int num_track)
 {
     if (buffer == NULL)
-        err(4);
-    return pos;
+        error(4);
+    return num_track;
 
     char *token = strtok(buffer, "\n $");
     if (token == NULL)
     {
-        return pos;
+        return num_track;
     }
 
     char *code = token;
     char *value = strtok(NULL, "\n ");
 
-
-
-    find(code, value, num_track, pos);
-
+    finding(code, value, num_track);
 }
 /**
  * find - finds a file
  * Return: void
  */
 
-void find(char *code, char *value, int num_track, int pos) {
+void finding(char *code, char *value, int num_track)
+{
     int i;
     int found_match = 0;
 
     instruction_t flist[] = {
-        {"push", add_to_stack},
-        {"pall", print_stack},
-        {"pint", print_top},
-        {"pop", pop_top},
-        {"nop", nop},
-        {"swap", swap_nodes},
-        {"add", add_nodes},
-        {"sub", sub_nodes},
-        {"div", div_nodes},
-        {"mul", mul_nodes},
-        {"mod", mod_nodes},
-        {"pchar", print_char},
-        {"pstr", print_str},
-        {"rotl", rotl},
-        {"rotr", rotr},
-        {NULL, NULL}
-    };
+        {"push", push},
+        {"pall", pal},
+        {NULL, NULL}};
 
     if (code[0] == '#')
         return;
 
-    for (i = 0; flist[i].code != NULL; i++) {
-        if (strcmp(code, flist[i].code) == 0) {
-            find(flist[i].func, code, value, num_track, pos);
+    for (i = 0; flist[i].opcode != NULL; i++)
+    {
+        if (strcmp(code, flist[i].opcode) == 0)
+        {
+            calling(flist[i].f, code, value, num_track);
             found_match = 1;
             break;
         }
     }
 
     if (!found_match)
-        err(3, num_track, code);
+        error(3, num_track, code);
+}
+
+void calling(op_func func, char *op, char *val, int ln)
+{
+    stack_t *node;
+    int flag;
+    int i;
+
+    flag = 1;
+    if (strcmp(op, "push") == 0)
+    {
+        if (val != NULL && val[0] == '-')
+        {
+            val = val + 1;
+            flag = -1;
+        }
+        if (val == NULL)
+            error(5, ln);
+        for (i = 0; val[i] != '\0'; i++)
+        {
+            if (isdigit(val[i]) == 0)
+                error(5, ln);
+        }
+        node = create_node(atoi(val) * flag);
+        func(&node, ln);
+    }
+    else
+        func(&head, ln);
 }
