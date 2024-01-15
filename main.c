@@ -16,3 +16,4 @@ int main(int argc, char **argv)
 	oppening(argv[1]);
 	exit(EXIT_SUCCESS);
 }
+
