@@ -45,7 +45,6 @@ int parsing(char *buffer, int num_track)
 {
     if (buffer == NULL)
         error(4);
-   
 
     char *token = strtok(buffer, "\n $");
     if (token == NULL)
@@ -56,7 +55,7 @@ int parsing(char *buffer, int num_track)
     char *value = strtok(NULL, "\n ");
 
     finding(token, value, num_track);
-     return num_track;
+    return num_track;
 }
 /**
  * find - finds a file
@@ -89,7 +88,10 @@ void finding(char *code, char *value, int num_track)
     if (!found_match)
         error(3, num_track, code);
 }
-
+/**
+ * calling - Calls the appropriate operation function.
+ * Return: void
+ */
 void calling(op_func func, char *op, char *val, int ln)
 {
     stack_t *node;
